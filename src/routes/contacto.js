@@ -1,22 +1,14 @@
 import express from "express";
-import nodemailer from "nodemailer";
 import dotenv from "dotenv";
 
 dotenv.config();
 const router = express.Router();
+const resend = new Resend(process.env.RESEND_API_KEY);
 
 router.post("/enviar", async (req, res) => {
   const { nombre, correo, mensaje } = req.body;
 
   try {
-    const transporter = nodemailer.createTransport({
-      service: process.env.EMAIL_SERVICE,
-      auth: {
-        user: process.env.EMAIL_USER,
-        pass: process.env.EMAIL_PASS,
-      },
-    });
-
     const htmlTemplate = `
       <div style="
         font-family: Arial, sans-serif;
@@ -60,7 +52,7 @@ router.post("/enviar", async (req, res) => {
       </div>
     `;
 
-    await transporter.sendMail({
+    await resend.emails.send({
       from: `"2ndLife" <${process.env.EMAIL_USER}>`,
       to: process.env.EMAIL_BOX,
       subject: "Nuevo mensaje de contacto - 2ndLife",
@@ -78,14 +70,6 @@ router.post("/adopcion", async (req, res) => {
   const { nombreMascota, correoUsuario, mensaje } = req.body;
 
   try {
-    const transporter = nodemailer.createTransport({
-      service: process.env.EMAIL_SERVICE,
-      auth: {
-        user: process.env.EMAIL_USER,
-        pass: process.env.EMAIL_PASS,
-      },
-    });
-
     // ✉️ Plantilla HTML para solicitudes de adopción
     const htmlTemplate = `
       <div style="
@@ -140,7 +124,7 @@ router.post("/adopcion", async (req, res) => {
       </div>
     `;
 
-    await transporter.sendMail({
+    await resend.emails.send({
       from: `"2ndLife Adopciones" <${process.env.EMAIL_USER}>`,
       to: process.env.EMAIL_BOX,
       subject: `Solicitud de adopción - ${nombreMascota}`,
